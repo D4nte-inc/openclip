@@ -1,0 +1,2 @@
+# openclip
+Advanced clipboard manager
