@@ -16,8 +16,7 @@ class ClipboardHistory:
 
 
     def add(self, text: str):
-        current_text_is_not_last_item = not self._clipboard_items[len(self._clipboard_items) - 1] == text
-        if current_text_is_not_last_item:
+        if not self._clipboard_items or not self._clipboard_items[len(self._clipboard_items) - 1] == text:
             self._clipboard_items.append(ClipboardItem(text, datetime.now()))
 
 
@@ -66,3 +65,6 @@ class ClipboardHistory:
                 favorite_items.append(clipboard_item)
 
         return favorite_items
+
+    def get_items(self) -> list[ClipboardItem]:
+        return self._clipboard_items
