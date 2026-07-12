@@ -21,7 +21,7 @@ class ClipboardHistory:
             self._clipboard_items.append(ClipboardItem(text, datetime.now()))
 
 
-    def search(self, query: str):
+    def search(self, query: str) -> list[ClipboardItem]:
         matching_items: list[ClipboardItem] = []
         for clipboard_item in self._clipboard_items:
             if clipboard_item.text.lower() == query.lower():
@@ -32,7 +32,7 @@ class ClipboardHistory:
         return matching_items
 
 
-    def get_items_since(self, date_query):
+    def get_items_since(self, date_query: datetime) -> list[ClipboardItem]:
         matching_items: list[ClipboardItem] = []
         for clipboard_item in self._clipboard_items:
             if clipboard_item.copied_at >= date_query:
@@ -42,7 +42,7 @@ class ClipboardHistory:
         return matching_items
 
 
-    def grouped(self):
+    def grouped(self) -> dict[str, int]:
         grouped_clipboard_texts_with_count: dict[str, int] = {}
         for clipboard_item in self._clipboard_items:
             if clipboard_item.text not in grouped_clipboard_texts_with_count:
@@ -52,3 +52,17 @@ class ClipboardHistory:
 
         return grouped_clipboard_texts_with_count
 
+
+    def toggle_favorite(self, text: str):
+        for clipboard_items in self._clipboard_items:
+            if clipboard_items.text == text:
+                clipboard_items.is_favorite = not clipboard_items.is_favorite
+
+
+    def favorites(self) -> list[ClipboardItem]:
+        favorite_items: list[ClipboardItem] = []
+        for clipboard_item in self._clipboard_items:
+            if clipboard_item.is_favorite:
+                favorite_items.append(clipboard_item)
+
+        return favorite_items
