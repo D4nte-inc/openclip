@@ -1,0 +1,54 @@
+from dataclasses import dataclass
+from datetime import datetime
+import pyperclip
+
+
+@dataclass
+class ClipboardItem:
+    text: str
+    copied_at: datetime
+    is_favorite: bool = False
+
+
+class ClipboardHistory:
+    def __init__(self, clipboard_items: list[ClipboardItem] | None = None):
+        self._clipboard_items = clipboard_items if clipboard_items is not None else []
+
+
+    def add(self, text: str):
+        current_text_is_not_last_item = not self._clipboard_items[len(self._clipboard_items) - 1] == text
+        if current_text_is_not_last_item:
+            self._clipboard_items.append(ClipboardItem(text, datetime.now()))
+
+
+    def search(self, query: str):
+        matching_items: list[ClipboardItem] = []
+        for clipboard_item in self._clipboard_items:
+            if clipboard_item.text.lower() == query.lower():
+                matching_items.append(clipboard_item)
+
+        if not matching_items:
+            return self._clipboard_items
+        return matching_items
+
+
+    def get_items_since(self, date_query):
+        matching_items: list[ClipboardItem] = []
+        for clipboard_item in self._clipboard_items:
+            if clipboard_item.copied_at >= date_query:
+                matching_items.append(clipboard_item)
+
+        matching_items.sort(key=lambda item: item.copied_at)
+        return matching_items
+
+
+    def grouped(self):
+        grouped_clipboard_texts_with_count: dict[str, int] = {}
+        for clipboard_item in self._clipboard_items:
+            if clipboard_item.text not in grouped_clipboard_texts_with_count:
+                grouped_clipboard_texts_with_count[clipboard_item.text] = 1
+            else:
+                grouped_clipboard_texts_with_count[clipboard_item.text] = grouped_clipboard_texts_with_count[clipboard_item.text] + 1
+
+        return grouped_clipboard_texts_with_count
+
