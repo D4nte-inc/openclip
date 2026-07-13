@@ -26,6 +26,16 @@ def save_history(history: ClipboardHistory):
             }
         })
 
-    with open(json_file_path, "a") as file:
-        json.dump(json_data_header, file, indent=4)
+    with open(json_file_path, "a") as f:
+        json.dump(json_data_header, f, indent=4)
+
+def load_history():
+    json_file_path = f"{os.getcwd()}/clipboard-data/clipboard_data.json"
+    file_content = {}
+    with open(json_file_path, "r") as f:
+        file_content = json.load(f)
+
+    return file_content
+
+
 
