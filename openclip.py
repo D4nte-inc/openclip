@@ -1,8 +1,9 @@
-import customtkinter as ctk
+from gui import OpenClipWindow
+from history import ClipboardHistory
 
 def main():
-    window = ctk.CTk()
-    window.title("OpenClip")
+    history = ClipboardHistory()
+    window = OpenClipWindow(history)
     window.mainloop()
 
 if __name__ == "__main__":

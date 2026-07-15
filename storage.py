@@ -1,9 +1,8 @@
+import json
+
 from datetime import datetime
 from pathlib import Path
-
 from history import ClipboardHistory, ClipboardItem
-import json
-import os
 
 def default_history_path() -> Path:
     return Path.cwd() / "clipboard-data" / "clipboard_data.json"
