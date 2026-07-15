@@ -1,13 +1,17 @@
 from datetime import datetime
+from pathlib import Path
 
 from history import ClipboardHistory, ClipboardItem
 import json
 import os
 
+def default_history_path() -> Path:
+    return Path.cwd() / "clipboard-data" / "clipboard_data.json"
+
 
 def save_history(history: ClipboardHistory):
     clipboard_history = history.get_items()
-    json_file_path = f"{os.getcwd()}/clipboard-data/clipboard_data.json"
+    json_file_path = default_history_path()
     entry_number = 0
     json_data = {
         "clipboard_header": {
@@ -41,10 +45,10 @@ def clipboard_history_from_json(json_file: dict[str, dict | list]) -> ClipboardH
     return ClipboardHistory(clipboard_items)
 
 
-def load_history() -> ClipboardHistory:
-    json_file_path = f"{os.getcwd()}/clipboard-data/clipboard_data.json"
+def load_history(path: Path | None = None) -> ClipboardHistory:
+    path = path or default_history_path()
     try:
-        with open(json_file_path, "r") as f:
+        with open(path, "r") as f:
             file_content = json.load(f)
             return clipboard_history_from_json(file_content)
     except (FileNotFoundError, json.JSONDecodeError):
@@ -56,7 +60,7 @@ def export(export_path: str) -> bool:
     :param export_path:
     :return: Returns True if everything goes well, False otherwise.
     """
-    json_file_path = f"{os.getcwd()}/clipboard-data/clipboard_data.json"
+    json_file_path = default_history_path()
     try:
         with open(json_file_path, "r") as original_json:
             with open(export_path, "a") as new_json:
@@ -64,4 +68,3 @@ def export(export_path: str) -> bool:
                 return True
     except (FileNotFoundError, json.JSONDecodeError):
         return False
-
