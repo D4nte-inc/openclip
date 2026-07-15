@@ -49,3 +49,19 @@ def load_history() -> ClipboardHistory:
             return clipboard_history_from_json(file_content)
     except (FileNotFoundError, json.JSONDecodeError):
         return ClipboardHistory([])
+
+
+def export(export_path: str) -> bool:
+    """
+    :param export_path:
+    :return: Returns True if everything goes well, False otherwise.
+    """
+    json_file_path = f"{os.getcwd()}/clipboard-data/clipboard_data.json"
+    try:
+        with open(json_file_path, "r") as original_json:
+            with open(export_path, "a") as new_json:
+                json.dump(json.load(original_json), new_json, indent=4)
+                return True
+    except (FileNotFoundError, json.JSONDecodeError):
+        return False
+
