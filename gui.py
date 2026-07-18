@@ -5,9 +5,12 @@ from history import ClipboardHistory
 
 
 class OpenClipWindow(ctk.CTk):
+    CLIPBOARD_MONITOR_CALL = 1000
+
     def __init__(self, history: ClipboardHistory):
         super().__init__()
         self._history = history
+        self._last_clip = None
         self.title("OpenClip")
         self.geometry("400x500")
 
