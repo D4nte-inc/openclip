@@ -1,7 +1,7 @@
 import customtkinter as ctk
 import tkinter as tk
 
-from history import ClipboardHistory
+from history import ClipboardHistory, ClipboardItem
 
 
 class OpenClipWindow(ctk.CTk):
@@ -15,6 +15,10 @@ class OpenClipWindow(ctk.CTk):
         self._query.trace_add("write", self._search)
         self._search_box = ctk.CTkEntry(self, textvariable=self._query)
         self._search_box.pack(fill="x", expand=True, padx=10)
+
+        self._optionmenu = ctk.CTkOptionMenu(self, values=["All", "Last hour", "Last 24h", "Last week", "Last Month"],
+                                             command=self._filter_by_date)
+        self._optionmenu.pack(fill="x", expand=True, padx=10, pady=10)
 
         self._list_area = ctk.CTkScrollableFrame(self)
         self._list_area.pack(fill="both", expand=True, padx=10, pady=10)
@@ -33,9 +37,13 @@ class OpenClipWindow(ctk.CTk):
         self.after(500, self._monitor_clipboard)
 
 
-    def _refresh_history(self):
+    def clean_list_area(self):
         for child in self._list_area.winfo_children():
             child.destroy()
+
+
+    def _refresh_history(self):
+        self.clean_list_area()
 
         for clipboard_item, count in self._history.grouped().items():
             row = ctk.CTkFrame(self._list_area)
@@ -46,12 +54,21 @@ class OpenClipWindow(ctk.CTk):
                 ctk.CTkLabel(row, text=f"{count}").pack(side="right", padx=5)
 
 
-    def _search(self, *_):
-        query_result = self._history.search(self._query.get())
-        for child in self._list_area.winfo_children():
-            child.destroy()
+    def override_list_area(self, query_result: list[ClipboardItem]):
+        self.clean_list_area()
 
         for clipboard_item in query_result:
             row = ctk.CTkFrame(self._list_area)
             row.pack(fill="x", pady=2)
             ctk.CTkLabel(row, text=clipboard_item.text).pack(side="left", padx=5)
+
+
+    def _search(self, *_):
+        query_result = self._history.search(self._query.get())
+        self.override_list_area(query_result)
+
+
+    def _filter_by_date(self, choice):
+        query_result = self._history.get_items_since(choice)
+        self.override_list_area(query_result)
+
