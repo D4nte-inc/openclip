@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from datetime import datetime
 
-@dataclass
+@dataclass(unsafe_hash=True)
 class ClipboardItem:
     text: str
     copied_at: datetime
@@ -41,15 +41,15 @@ class ClipboardHistory:
         return matching_items
 
 
-    def grouped(self) -> dict[str, int]:
-        grouped_clipboard_texts_with_count: dict[str, int] = {}
+    def grouped(self) -> dict[ClipboardItem, int]:
+        grouped_clipboards_with_count: dict[ClipboardItem, int] = {}
         for clipboard_item in self._clipboard_items:
-            if clipboard_item.text not in grouped_clipboard_texts_with_count:
-                grouped_clipboard_texts_with_count[clipboard_item.text] = 1
+            if clipboard_item not in grouped_clipboards_with_count:
+                grouped_clipboards_with_count[clipboard_item] = 1
             else:
-                grouped_clipboard_texts_with_count[clipboard_item.text] = grouped_clipboard_texts_with_count[clipboard_item.text] + 1
+                grouped_clipboards_with_count[clipboard_item] = grouped_clipboards_with_count[clipboard_item] + 1
 
-        return grouped_clipboard_texts_with_count
+        return grouped_clipboards_with_count
 
 
     def toggle_favorite(self, text: str):

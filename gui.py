@@ -37,11 +37,11 @@ class OpenClipWindow(ctk.CTk):
         for child in self._list_area.winfo_children():
             child.destroy()
 
-        for text, count in self._history.grouped().items():
+        for clipboard_item, count in self._history.grouped().items():
             row = ctk.CTkFrame(self._list_area)
             row.pack(fill="x", pady=2)
 
-            ctk.CTkLabel(row, text=text).pack(side="left", padx=5)
+            ctk.CTkLabel(row, text=f"{clipboard_item.text} - {clipboard_item.copied_at.strftime("%d/%m/%Y %H:%M:%S")}").pack(side="left", padx=5)
             if count > 1:
                 ctk.CTkLabel(row, text=f"{count}").pack(side="right", padx=5)
 
