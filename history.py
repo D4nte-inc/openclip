@@ -1,11 +1,12 @@
-from dataclasses import dataclass
-from datetime import datetime
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta
+
 
 @dataclass(unsafe_hash=True)
 class ClipboardItem:
     text: str
-    copied_at: datetime
-    is_favorite: bool = False
+    copied_at: datetime = field(compare=False)
+    is_favorite: bool = field(default=False, compare=False)
 
 
 class ClipboardHistory:
@@ -31,8 +32,22 @@ class ClipboardHistory:
         return matching_items
 
 
-    def get_items_since(self, date_query: datetime) -> list[ClipboardItem]:
+    def get_items_since(self, since: str) -> list[ClipboardItem]:
         matching_items: list[ClipboardItem] = []
+        date_query: datetime = datetime.min
+
+        match since:
+            case "All":
+                date_query = datetime.min
+            case "Last hour":
+                date_query = datetime.now() - timedelta(hours=1)
+            case "Last 24h":
+                date_query = datetime.now() - timedelta(days=1)
+            case "Last week":
+                date_query = datetime.now() - timedelta(weeks=1)
+            case "Last Month":
+                date_query = datetime.now() - timedelta(days=30)
+
         for clipboard_item in self._clipboard_items:
             if clipboard_item.copied_at >= date_query:
                 matching_items.append(clipboard_item)
@@ -42,14 +57,14 @@ class ClipboardHistory:
 
 
     def grouped(self) -> dict[ClipboardItem, int]:
-        grouped_clipboards_with_count: dict[ClipboardItem, int] = {}
+        grouped_clipboard_texts_with_count: dict[ClipboardItem, int] = {}
         for clipboard_item in self._clipboard_items:
-            if clipboard_item not in grouped_clipboards_with_count:
-                grouped_clipboards_with_count[clipboard_item] = 1
+            if clipboard_item not in grouped_clipboard_texts_with_count:
+                grouped_clipboard_texts_with_count[clipboard_item] = 1
             else:
-                grouped_clipboards_with_count[clipboard_item] = grouped_clipboards_with_count[clipboard_item] + 1
+                grouped_clipboard_texts_with_count[clipboard_item] = grouped_clipboard_texts_with_count[clipboard_item] + 1
 
-        return grouped_clipboards_with_count
+        return grouped_clipboard_texts_with_count
 
 
     def toggle_favorite(self, text: str):
