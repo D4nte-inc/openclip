@@ -13,9 +13,11 @@ class ClipboardHistory:
         self._clipboard_items = clipboard_items if clipboard_items is not None else []
 
 
-    def add(self, text: str):
+    def add(self, text: str) -> bool:
         if len(self._clipboard_items) == 0 or not self._clipboard_items[len(self._clipboard_items) - 1].text == text:
             self._clipboard_items.append(ClipboardItem(text, datetime.now()))
+            return True
+        return False
 
 
     def search(self, query: str) -> list[ClipboardItem]:
