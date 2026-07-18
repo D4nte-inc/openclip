@@ -14,7 +14,7 @@ class ClipboardHistory:
 
 
     def add(self, text: str):
-        if not self._clipboard_items or not self._clipboard_items[len(self._clipboard_items) - 1] == text:
+        if len(self._clipboard_items) == 0 or not self._clipboard_items[len(self._clipboard_items) - 1].text == text:
             self._clipboard_items.append(ClipboardItem(text, datetime.now()))
 
 
