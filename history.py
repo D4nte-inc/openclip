@@ -21,7 +21,7 @@ class ClipboardHistory:
     def search(self, query: str) -> list[ClipboardItem]:
         matching_items: list[ClipboardItem] = []
         for clipboard_item in self._clipboard_items:
-            if clipboard_item.text.lower() == query.lower():
+            if query.lower() in clipboard_item.text.lower():
                 matching_items.append(clipboard_item)
 
         if not matching_items:
