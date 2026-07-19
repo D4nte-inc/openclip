@@ -1,10 +1,13 @@
+import storage
 from gui import OpenClipWindow
-from history import ClipboardHistory
 
 def main():
-    history = ClipboardHistory()
-    window = OpenClipWindow(history)
-    window.mainloop()
+    path = storage.default_history_path()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    history = storage.load_history(path)
+    OpenClipWindow(history).mainloop()
+
+
 
 if __name__ == "__main__":
     main()
