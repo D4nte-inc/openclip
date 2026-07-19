@@ -1,6 +1,8 @@
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 
+import storage
+
 
 @dataclass(unsafe_hash=True)
 class ClipboardItem:
@@ -17,6 +19,7 @@ class ClipboardHistory:
     def add(self, text: str) -> bool:
         if len(self._clipboard_items) == 0 or not self._clipboard_items[len(self._clipboard_items) - 1].text == text:
             self._clipboard_items.append(ClipboardItem(text, datetime.now()))
+            storage.save_history(self)
             return True
         return False
 
@@ -71,6 +74,7 @@ class ClipboardHistory:
         for clipboard_items in self._clipboard_items:
             if clipboard_items.text == text:
                 clipboard_items.is_favorite = not clipboard_items.is_favorite
+        storage.save_history(self)
 
 
     def favorites(self) -> list[ClipboardItem]:

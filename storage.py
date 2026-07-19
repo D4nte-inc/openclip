@@ -29,7 +29,7 @@ def save_history(history: ClipboardHistory):
             "favorite": clipboard_entry.is_favorite
         })
 
-    with open(json_file_path, "a") as f:
+    with open(json_file_path, "w") as f:
         json.dump(json_data, f, indent=4)
 
 

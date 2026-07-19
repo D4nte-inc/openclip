@@ -37,6 +37,7 @@ class OpenClipWindow(ctk.CTk):
         self._list_area = ctk.CTkScrollableFrame(self)
         self._list_area.pack(fill="both", expand=True, padx=10, pady=10)
 
+        self._refresh_history()
         self._monitor_clipboard()
 
 
