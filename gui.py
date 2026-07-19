@@ -1,5 +1,9 @@
+import tkinter.filedialog
+from pathlib import Path
+
 import customtkinter as ctk
 import tkinter as tk
+import storage
 
 from history import ClipboardHistory, ClipboardItem
 
@@ -16,6 +20,11 @@ class OpenClipWindow(ctk.CTk):
         self._search_box = ctk.CTkEntry(self, textvariable=self._query)
         self._search_box.pack(fill="x", expand=True, padx=10)
 
+        self._export_button = ctk.CTkButton(self, text="Export", command=self.export_history)
+        self._export_button.pack(fill="x", expand=True, padx=10, pady=10)
+
+        self._import_button = ctk.CTkButton(self, text="Import", command=self.import_history)
+        self._import_button.pack(fill="x", expand=True, padx=10, pady=10)
 
         self._optionmenu = ctk.CTkOptionMenu(self, values=["All", "Last hour", "Last 24h", "Last week", "Last Month"],
                                              command=self._filter_by_date)
@@ -92,4 +101,21 @@ class OpenClipWindow(ctk.CTk):
             result = self._history.favorites()
             self.override_list_area(result)
         else:
+            self._refresh_history()
+
+
+    def export_history(self):
+        path = tk.filedialog.asksaveasfilename(
+            defaultextension=".json",
+            filetypes=[("JSON files", "*.json")])
+        if path:
+            storage.export(path)
+
+    def import_history(self):
+        path = tk.filedialog.askopenfilename(
+            defaultextension=".json",
+            filetypes=[("JSON files", "*.json")]
+        )
+        if path:
+            self._history = storage.load_history(Path(path))
             self._refresh_history()
