@@ -202,7 +202,7 @@ class OpenClipWindow(ctk.CTk):
                           "Be sure to save a copy first, this operations cannot be undone").pack(pady=15)
 
         def confirm():
-            self._history.clear()
+            self._history.clear_all()
             self._refresh_history()
             dialog.destroy()
 
@@ -215,9 +215,8 @@ class OpenClipWindow(ctk.CTk):
 
 
     def _style_tk_dialogs(self):
-        # Dark defaults for the built-in Tk file dialogs (CTk colors).
         style = ttk.Style()
-        style.theme_use( "clam")  # clam honors color overrides; default/alt ignore them
+        style.theme_use( "clam")
         style.configure(".", background="#2b2b2b", foreground="#ffffff",
                         fieldbackground="#343638",
                         selectbackground="#1f6aa5", selectforeground="#ffffff")

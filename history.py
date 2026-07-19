@@ -92,11 +92,15 @@ class ClipboardHistory:
         return self._clipboard_items
 
 
-    def clear(self):
+    def clear_all(self):
         self._clipboard_items.clear()
         storage.save_history(self)
 
 
     def remove(self, text: str):
-        self._clipboard_items = [item for item in self._clipboard_items if item.text != text]
+        clipboard_items = []
+        for clipboard_item in self._clipboard_items:
+            if clipboard_item.text != text:
+                clipboard_items.append(clipboard_item)
+        self._clipboard_items = clipboard_items
         storage.save_history(self)
