@@ -17,6 +17,8 @@ class ClipboardHistory:
 
 
     def add(self, text: str) -> bool:
+        if not text:
+            return False
         if len(self._clipboard_items) == 0 or not self._clipboard_items[len(self._clipboard_items) - 1].text == text:
             self._clipboard_items.append(ClipboardItem(text, datetime.now()))
             storage.save_history(self)
@@ -27,7 +29,7 @@ class ClipboardHistory:
     def search(self, query: str) -> list[ClipboardItem]:
         matching_items: list[ClipboardItem] = []
         for clipboard_item in self._clipboard_items:
-            if query.lower() in clipboard_item.text.lower():
+            if query.lower() in clipboard_item.text.lower() and clipboard_item not in matching_items:
                 matching_items.append(clipboard_item)
 
         if not matching_items:
@@ -61,7 +63,7 @@ class ClipboardHistory:
 
     def grouped(self) -> dict[ClipboardItem, int]:
         grouped_clipboard_texts_with_count: dict[ClipboardItem, int] = {}
-        for clipboard_item in self._clipboard_items:
+        for clipboard_item in reversed(self._clipboard_items):
             if clipboard_item not in grouped_clipboard_texts_with_count:
                 grouped_clipboard_texts_with_count[clipboard_item] = 1
             else:
@@ -85,5 +87,16 @@ class ClipboardHistory:
 
         return favorite_items
 
+
     def get_items(self) -> list[ClipboardItem]:
         return self._clipboard_items
+
+
+    def clear(self):
+        self._clipboard_items.clear()
+        storage.save_history(self)
+
+
+    def remove(self, text: str):
+        self._clipboard_items = [item for item in self._clipboard_items if item.text != text]
+        storage.save_history(self)

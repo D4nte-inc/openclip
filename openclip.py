@@ -7,7 +7,5 @@ def main():
     history = storage.load_history(path)
     OpenClipWindow(history).mainloop()
 
-
-
 if __name__ == "__main__":
     main()

@@ -36,6 +36,8 @@ def save_history(history: ClipboardHistory):
 def clipboard_history_from_json(json_file: dict[str, dict | list]) -> ClipboardHistory:
     clipboard_items: list[ClipboardItem] = []
     for json_entry in json_file["clipboard_body"]:
+        if not json_entry["clipboard_data"]:
+            continue
         clipboard_item = ClipboardItem(json_entry["clipboard_data"],
                                        datetime.fromisoformat(json_entry["timestamp"]),
                                        bool(json_entry["favorite"]))
