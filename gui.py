@@ -25,7 +25,6 @@ class OpenClipWindow(ctk.CTk):
         self._search_box = ctk.CTkEntry(self, placeholder_text="Search…")
         self._search_box.pack(fill="x", expand=True, padx=10)
         self._search_box.bind("<KeyRelease>", self._search)
-        self._search_box.pack(fill="x", expand=True, padx=10)
 
         self._import_export_area = ctk.CTkFrame(self, fg_color="transparent")
         self._import_export_area.pack(fill="x", padx=10, pady=10)
@@ -79,34 +78,35 @@ class OpenClipWindow(ctk.CTk):
             child.destroy()
 
 
+    def _row_button(self, parent, text, command):
+        return tk.Button(
+            parent, text=text, command=command,
+            relief="flat", bd=0, highlightthickness=0,
+            bg="#343638", fg="#ffffff",
+            activebackground="#1f6aa5", activeforeground="#ffffff",
+            cursor="hand2", padx=8, pady=2,
+        )
+
+
     def _refresh_history(self):
         self.clean_list_area()
 
         for clipboard_item, count in self._history.grouped().items():
-            row = ctk.CTkFrame(self._list_area)
+            row = tk.Frame(self._list_area)
             row.pack(fill="x", pady=2)
             star = "⭐" if clipboard_item.is_favorite else "☆"
-            ctk.CTkButton(
-                row, text=star, width=32,
-                hover=True,
-                command=lambda t=clipboard_item.text: self.toggle_favorite(t),
-            ).pack(side="right", padx=5)
+            self._row_button(row, star,
+                             lambda t=clipboard_item.text: self.toggle_favorite(t)).pack(side="right", padx=5)
 
-            ctk.CTkButton(
-                row, text="⧉", width=32,
-                hover=True,
-                command=lambda t=clipboard_item.text: self._copy_to_clipboard(t),
-            ).pack(side="right", padx=5)
+            self._row_button(row, "⧉",
+                             lambda t=clipboard_item.text: self._copy_to_clipboard(t)).pack(side="right", padx=5)
 
-            ctk.CTkButton(
-                row,
-                text="🗑", width=32,
-            command = lambda t=clipboard_item.text: self._delete_item(t),
-            ).pack(side="right", padx=5)
+            self._row_button(row, "🗑",
+                             lambda t=clipboard_item.text: self._delete_item(t)).pack(side="right", padx=5)
 
-            ctk.CTkLabel(row, text=f"{clipboard_item.text} - {clipboard_item.copied_at.strftime("%d/%m/%Y %H:%M:%S")}").pack(side="left", padx=5)
+            tk.Label(row, text=f"{clipboard_item.text} - {clipboard_item.copied_at.strftime("%d/%m/%Y %H:%M:%S")}").pack(side="left", padx=5)
             if count > 1:
-                ctk.CTkLabel(row, text=f"{count}").pack(side="right", padx=5)
+                tk.Label(row, text=f"{count}").pack(side="right", padx=5)
 
         self._counter_label.configure(text=f"{len(self._history.get_items())} items")
 
@@ -115,30 +115,22 @@ class OpenClipWindow(ctk.CTk):
         self.clean_list_area()
 
         for clipboard_item in query_result:
-            row = ctk.CTkFrame(self._list_area)
+            row = tk.Frame(self._list_area)
             row.pack(fill="x", pady=2)
             star = "⭐" if clipboard_item.is_favorite else "☆"
-            ctk.CTkButton(
-                row, text=star, width=32,
-                command=lambda t=clipboard_item.text: self.toggle_favorite(t),
-            ).pack(side="right", padx=5)
+            self._row_button(row, star,
+                             lambda t=clipboard_item.text: self.toggle_favorite(t)).pack(side="right", padx=5)
 
-            ctk.CTkButton(
-                row, text="⧉", width=32,
-                hover=True,
-                command=lambda t=clipboard_item.text: self._copy_to_clipboard(t),
-            ).pack(side="right", padx=5)
+            self._row_button(row, "⧉",
+                             lambda t=clipboard_item.text: self._copy_to_clipboard(t)).pack(side="right", padx=5)
 
-            ctk.CTkButton(
-                row,
-                text="🗑", width=32,
-                command=lambda t=clipboard_item.text: self._delete_item(t),
-            ).pack(side="right", padx=5)
+            self._row_button(row, "🗑",
+                             lambda t=clipboard_item.text: self._delete_item(t)).pack(side="right", padx=5)
 
-            ctk.CTkLabel(row, text=clipboard_item.text).pack(side="left", padx=5)
+            tk.Label(row, text=clipboard_item.text).pack(side="left", padx=5)
 
     def _search(self, *_):
-        query = self._query.get()
+        query = self._search_box.get()
         if not query:
             self._refresh_history()
             return
@@ -220,3 +212,8 @@ class OpenClipWindow(ctk.CTk):
         style.configure(".", background="#2b2b2b", foreground="#ffffff",
                         fieldbackground="#343638",
                         selectbackground="#1f6aa5", selectforeground="#ffffff")
+        # Dark defaults for plain tk widgets (the history rows).
+        self.option_add("*background", "#2b2b2b")
+        self.option_add("*foreground", "#ffffff")
+        self.option_add("*activeBackground", "#1f6aa5")
+        self.option_add("*activeForeground", "#ffffff")
