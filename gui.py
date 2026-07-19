@@ -16,9 +16,14 @@ class OpenClipWindow(ctk.CTk):
         self._search_box = ctk.CTkEntry(self, textvariable=self._query)
         self._search_box.pack(fill="x", expand=True, padx=10)
 
+
         self._optionmenu = ctk.CTkOptionMenu(self, values=["All", "Last hour", "Last 24h", "Last week", "Last Month"],
                                              command=self._filter_by_date)
         self._optionmenu.pack(fill="x", expand=True, padx=10, pady=10)
+
+        self._only_favorites_button = ctk.CTkSwitch(self, text="View favorites", command=self.show_favorites,
+                                                    onvalue=True, offvalue=False)
+        self._only_favorites_button.pack(fill="x", expand=True, padx=10, pady=10)
 
         self._list_area = ctk.CTkScrollableFrame(self)
         self._list_area.pack(fill="both", expand=True, padx=10, pady=10)
@@ -48,6 +53,11 @@ class OpenClipWindow(ctk.CTk):
         for clipboard_item, count in self._history.grouped().items():
             row = ctk.CTkFrame(self._list_area)
             row.pack(fill="x", pady=2)
+            star = "⭐" if clipboard_item.is_favorite else "☆"
+            ctk.CTkButton(
+                row, text=star, width=32,
+                command=lambda t=clipboard_item.text: self.toggle_favorite(t),
+            ).pack(side="right", padx=5)
 
             ctk.CTkLabel(row, text=f"{clipboard_item.text} - {clipboard_item.copied_at.strftime("%d/%m/%Y %H:%M:%S")}").pack(side="left", padx=5)
             if count > 1:
@@ -72,3 +82,14 @@ class OpenClipWindow(ctk.CTk):
         query_result = self._history.get_items_since(choice)
         self.override_list_area(query_result)
 
+
+    def toggle_favorite(self, text: str):
+        self._history.toggle_favorite(text)
+        self._refresh_history()
+
+    def show_favorites(self):
+        if self._only_favorites_button.get():
+            result = self._history.favorites()
+            self.override_list_area(result)
+        else:
+            self._refresh_history()
