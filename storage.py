@@ -37,8 +37,8 @@ def clipboard_history_from_json(json_file: dict[str, dict | list]) -> ClipboardH
     clipboard_items: list[ClipboardItem] = []
     for json_entry in json_file["clipboard_body"]:
         clipboard_item = ClipboardItem(json_entry["clipboard_data"],
-                                       json_entry["timestamp"],
-                                       json_entry["favorite"])
+                                       datetime.fromisoformat(json_entry["timestamp"]),
+                                       bool(json_entry["favorite"]))
         clipboard_items.append(clipboard_item)
 
     return ClipboardHistory(clipboard_items)
