@@ -1,3 +1,16 @@
+"""
+    Author: d4nte
+    Date: 19/07/2026
+
+    Title: OpenClip - JSON persistence layer.
+    Saves and loads the clipboard history to/from a JSON file and
+    handles the export of the user data to a custom path.
+
+    The JSON file has two sections:
+        clipboard_header -> openclip version, save date, entries count
+        clipboard_body   -> one entry per item: progressive number,
+                            text, timestamp and favorite flag
+"""
 import json
 
 from datetime import datetime
@@ -5,13 +18,30 @@ from pathlib import Path
 from history import ClipboardHistory, ClipboardItem
 
 def default_history_path() -> Path:
+    """
+    Function: default_history_path
+    Builds the path of the JSON file where the history is saved.
+    Formal parameters:
+        None
+    Return value:
+        Path -> <current working dir>/clipboard-data/clipboard_data.json
+    """
     return Path.cwd() / "clipboard-data" / "clipboard_data.json"
 
 
 def save_history(history: ClipboardHistory):
+    """
+    Function: save_history
+    Writes the whole history to the default JSON file, overwriting
+    the previous content.
+    Formal parameters:
+        ClipboardHistory history -> the history to persist
+    """
     clipboard_history = history.get_items()
     json_file_path = default_history_path()
+    # Progressive number assigned to each entry of the body
     entry_number = 0
+    # Skeleton of the JSON document: header filled now, body filled below
     json_data = {
         "clipboard_header": {
             "openclip_version": 0.4,
@@ -34,6 +64,17 @@ def save_history(history: ClipboardHistory):
 
 
 def clipboard_history_from_json(json_file: dict[str, dict | list]) -> ClipboardHistory:
+    """
+    Function: clipboard_history_from_json
+    Rebuilds a ClipboardHistory object from an already parsed JSON
+    document. Entries with empty text are skipped.
+    Formal parameters:
+        dict[str, dict | list] json_file -> the parsed JSON document,
+            with the clipboard_header / clipboard_body structure
+    Return value:
+        ClipboardHistory -> the history holding one ClipboardItem per
+            valid entry of the body
+    """
     clipboard_items: list[ClipboardItem] = []
     for json_entry in json_file["clipboard_body"]:
         if not json_entry["clipboard_data"]:
@@ -47,6 +88,16 @@ def clipboard_history_from_json(json_file: dict[str, dict | list]) -> ClipboardH
 
 
 def load_history(path: Path | None = None) -> ClipboardHistory:
+    """
+    Function: load_history
+    Reads the history from a JSON file. The load is safe: if the file
+    does not exist or holds broken JSON, an empty history is returned
+    instead of crashing.
+    Formal parameters:
+        Path | None path -> the file to read; None uses the default path
+    Return value:
+        ClipboardHistory -> the loaded history, empty on error
+    """
     path = path or default_history_path()
     try:
         with open(path, "r") as f:
@@ -58,8 +109,14 @@ def load_history(path: Path | None = None) -> ClipboardHistory:
 
 def export(export_path: str) -> bool:
     """
-    :param export_path:
-    :return: Returns True if everything goes well, False otherwise.
+    Function: export
+    Copies the current history file to a path chosen by the user,
+    so the data can be backed up or moved to another machine.
+    Formal parameters:
+        str export_path -> destination file chosen by the user
+    Return value:
+        bool -> True if everything goes well, False otherwise
+            (missing or corrupted history file)
     """
     json_file_path = default_history_path()
     try:
